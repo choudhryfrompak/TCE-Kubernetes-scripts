@@ -1,0 +1,92 @@
+---
+- name: Initialize Kubernetes Control Plane with GPU Support
+  hosts: master_main
+  become: true
+  
+  tasks:
+    - name: Pull required images
+      command: kubeadm config images pull
+      
+    - name: Initialize kubeadm
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16
+      register: kubeadm_init
+      
+    - name: Create .kube directory
+      file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        mode: '0755'
+      
+    - name: Copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        remote_src: yes
+        owner: "{{ ansible_env.USER }}"
+        group: "{{ ansible_env.USER }}"
+        mode: '0600'
+        
+    - name: Install Calico operator
+      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+      
+    - name: Download Calico custom resources file
+      get_url:
+        url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml
+        dest: /tmp/custom-resources.yaml
+        
+    - name: Update CIDR in custom resources
+      replace:
+        path: /tmp/custom-resources.yaml
+        regexp: 'cidr: 192\.168\.0\.0\/16'
+        replace: 'cidr: 10.244.0.0/16'
+        
+    - name: Apply Calico custom resources
+      command: kubectl create -f /tmp/custom-resources.yaml
+
+    -name: Apply calico latest
+      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
+      
+    # NVIDIA Device Plugin Setup
+    - name: Create NVIDIA device plugin manifest
+      copy:
+        content: |
+          apiVersion: apps/v1
+          kind: DaemonSet
+          metadata:
+            name: nvidia-device-plugin-daemonset
+            namespace: kube-system
+          spec:
+            selector:
+              matchLabels:
+                name: nvidia-device-plugin-ds
+            template:
+              metadata:
+                labels:
+                  name: nvidia-device-plugin-ds
+              spec:
+                containers:
+                - name: nvidia-device-plugin-ctr
+                  image: nvcr.io/nvidia/k8s-device-plugin:v0.14.3
+                  env:
+                    - name: FAIL_ON_INIT_ERROR
+                      value: "false"
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop: ["ALL"]
+                  volumeMounts:
+                    - name: device-plugin
+                      mountPath: /var/lib/kubelet/device-plugins
+                priorityClassName: system-node-critical
+                tolerations:
+                  - key: nvidia.com/gpu
+                    operator: Exists
+                    effect: NoSchedule
+                volumes:
+                  - name: device-plugin
+                    hostPath:
+                      path: /var/lib/kubelet/device-plugins
+        dest: /tmp/nvidia-device-plugin.yaml
+        
+    - name: Apply NVIDIA device plugin
+      command: kubectl apply -f /tmp/nvidia-device-plugin.yaml

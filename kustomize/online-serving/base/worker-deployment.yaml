@@ -18,6 +18,11 @@ spec:
         operator: "Equal"
         value: "worker"
         effect: "NoSchedule"
+      initContainers:
+      - name: wait-for-head
+        image: busybox:1.28
+        command: ['sh', '-c', 
+          'until nslookup vllm-head-service.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local && nc -z vllm-head-service 6379; do echo waiting for head node; sleep 2; done']
       containers:
       - name: vllm-worker
         image: vllm/vllm-openai:latest

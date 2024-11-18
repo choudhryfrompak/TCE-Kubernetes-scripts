@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: worker
+spec:
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component: worker
+    spec:
+      nodeSelector:
+        role: worker
+      tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "worker"
+        effect: "NoSchedule"
+      containers:
+      - name: vllm-worker
+        image: vllm/vllm-openai:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: vllm
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+          requests:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: huggingface-cache
+          mountPath: /root/.cache/huggingface
+        - name: model-cache
+          mountPath: /vllm-workspace/examples
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "ray start --address=$(VLLM_HEAD_SERVICE):6379 --block"
+        env:
+        - name: VLLM_HEAD_SERVICE
+          value: vllm-head-service
+      volumes:
+      - name: huggingface-cache
+        hostPath:
+          path: /root/.cache/huggingface
+      - name: benchmarks
+        hostPath:
+          path: /home/ubuntu/models

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: head
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: head
+  template:
+    metadata:
+      labels:
+        component: head
+    spec:
+      nodeSelector:
+        role: master
+      containers:
+      - name: vllm-head
+        image: vllm/vllm-openai:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6379
+          name: ray
+        - containerPort: 8000
+          name: vllm
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+          requests:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: huggingface-cache
+          mountPath: /root/.cache/huggingface
+        - name: model-cache
+          mountPath: /vllm-workspace/examples
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "ray start --head --port=6379 --block && tail -f /dev/null"
+      volumes:
+      - name: huggingface-cache
+        hostPath:
+          path: /root/.cache/huggingface
+      - name: benchmarks
+        hostPath:
+          path: /home/ubuntu/models

@@ -31,7 +31,7 @@ spec:
         volumeMounts:
         - name: huggingface-cache
           mountPath: /root/.cache/huggingface
-        - name: model-cache
+        - name: benchmarks
           mountPath: /vllm-workspace/examples
         command:
         - "/bin/sh"
@@ -43,4 +43,4 @@ spec:
           path: /root/.cache/huggingface
       - name: benchmarks
         hostPath:
-          path: /home/ubuntu/models
+          path: /root/TCE-Kubernetes-scripts/vllm-tensor-parallel/

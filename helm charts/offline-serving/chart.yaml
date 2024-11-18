@@ -1,0 +1,13 @@
+apiVersion: v2
+name: vllm-cluster
+description: A Helm chart for deploying vLLM cluster on Kubernetes for offline serving.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - vllm
+  - machine learning
+  - gpu
+maintainers:
+  - name: "choudhry-shehryar"
+    email: "shahriyarraheel786@gmail.com"

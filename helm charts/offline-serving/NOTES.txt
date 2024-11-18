@@ -1,0 +1,42 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+1. The vLLM head node is deployed as:
+   $ kubectl get pods -l app={{ .Values.headNode.name }} -n {{ .Values.namespace.name }}
+
+2. Worker nodes are deployed as a DaemonSet on all nodes labeled with role=worker:
+   $ kubectl get daemonset vllm-worker -n {{ .Values.namespace.name }}
+   
+   To see worker pods:
+   $ kubectl get pods -l app=vllm-worker -n {{ .Values.namespace.name }}
+
+3. To access the vLLM service:
+   {{- if contains "NodePort" .Values.service.vllm.type }}
+   Get the node port:
+   $ NODE_PORT=$(kubectl get --namespace {{ .Values.namespace.name }} -o jsonpath="{.spec.ports[0].nodePort}" services vllm-service)
+   $ NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+   
+   Your service is available at: http://$NODE_IP:$NODE_PORT
+   {{- else if contains "LoadBalancer" .Values.service.vllm.type }}
+   Get the LoadBalancer IP/hostname:
+   $ SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace.name }} vllm-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+   
+   Your service is available at: http://$SERVICE_IP:{{ .Values.service.vllm.port }}
+   {{- else if contains "ClusterIP" .Values.service.vllm.type }}
+   The service is only accessible within the cluster at:
+   vllm-service.{{ .Values.namespace.name }}.svc.cluster.local:{{ .Values.service.vllm.port }}
+   {{- end }}
+
+4. To ensure proper worker deployment, make sure your nodes are labeled:
+   $ kubectl label nodes <node-name> role=worker
+
+5. To check worker node status:
+   $ kubectl get pods -l app=vllm-worker -n {{ .Values.namespace.name }} -o wide
+
+Note: It may take a few minutes for the pods to be ready and the service to be available.

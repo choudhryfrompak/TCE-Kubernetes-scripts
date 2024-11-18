@@ -1,0 +1,19 @@
+##run benchmark for online-serving
+python3 benchmark-online-serving.py   --num_requests 1000   --concurrency 100   --request_timeout 30   --output_tokens 100   --vllm_url http://0.0.0.0:8080/v1   --api_key YOUR_API_KEY
+
+##run online-serving
+python3 -m vllm.entrypoints.openai.api_server --port 8080 --trust-remote-code --served-model-name ministral --model /root/.cache/huggingface/hub/models--mistralai--Ministral-8B-Instruct-2410/ --gpu-memory-utilization 0.99 --tensor-parallel-size 1 --pipeline-parallel-size 2 --dtype half
+
+#curl request for online serving.
+curl -X POST 'http://0.0.0.0:8080/v1/chat/completions'   -H 'Content-Type: application/json'   -d '{
+    "messages": [
+      {
+        "role": "user",
+        "content": "write a 1000 word essay"
+      }
+    ],
+    "model": "ministral"
+  }'
+
+##offline inference benchmark
+python3 benchmark-offline-serving.py

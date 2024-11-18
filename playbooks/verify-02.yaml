@@ -1,0 +1,50 @@
+---
+- name: Verify Container Runtime Installation
+  hosts: all
+  become: true
+  tasks:
+    - name: Verify required packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - containerd.io
+        state: present
+      check_mode: yes
+      register: pkg_check
+      failed_when: pkg_check.changed
+
+    - name: Check Docker repository configuration
+      stat:
+        path: /etc/apt/sources.list.d/docker.list
+      register: docker_repo
+      failed_when: not docker_repo.stat.exists
+
+    - name: Verify NVIDIA Container Toolkit installation
+      command: nvidia-container-cli info
+      register: nvidia_cli
+      failed_when: nvidia_cli.rc != 0
+
+    - name: Check containerd config exists
+      stat:
+        path: /etc/containerd/config.toml
+      register: containerd_config
+      failed_when: not containerd_config.stat.exists
+
+    - name: Verify NVIDIA runtime configuration
+      shell: grep -E 'default_runtime_name = "nvidia"|runtime = "nvidia-container-runtime"' /etc/containerd/config.toml
+      register: runtime_check
+      failed_when: runtime_check.rc != 0 or runtime_check.stdout_lines|length != 2
+
+    - name: Check containerd service status
+      service:
+        name: containerd
+        state: started
+      register: containerd_status
+      failed_when: not containerd_status.status.ActiveState == "active"
+
+    - name: Verify NVIDIA runtime functionality
+      shell: ctr runtime list | grep nvidia
+      register: nvidia_runtime
+      failed_when: nvidia_runtime.rc != 0

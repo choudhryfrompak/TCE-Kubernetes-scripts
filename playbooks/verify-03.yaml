@@ -1,0 +1,47 @@
+---
+- name: Verify Kubernetes Installation
+ hosts: all
+ become: true
+ tasks:
+   - name: Verify repository setup
+     stat:
+       path: /etc/apt/sources.list.d/kubernetes.list
+     register: k8s_repo
+     failed_when: not k8s_repo.stat.exists
+
+   - name: Verify Kubernetes packages
+     apt:
+       name:
+         - kubelet
+         - kubeadm
+         - kubectl
+       state: present
+     check_mode: yes
+     register: pkg_check
+     failed_when: pkg_check.changed
+
+   - name: Verify package holds
+     shell: dpkg --get-selections | grep "{{ item }}" | grep "hold"
+     register: hold_status
+     loop:
+       - kubelet
+       - kubeadm
+       - kubectl
+       - containerd
+     failed_when: hold_status.rc != 0
+
+   - name: Verify kubectl functionality
+     command: kubectl version --client
+     register: kubectl_version
+     failed_when: kubectl_version.rc != 0
+
+   - name: Check bash completion installation
+     stat:
+       path: /etc/bash_completion.d/kubectl
+     register: completion_file
+     failed_when: not completion_file.stat.exists
+
+   - name: Verify bash completion source in bashrc
+     shell: grep "source <(kubectl completion bash)" ~/.bashrc
+     register: bashrc_check
+     failed_when: bashrc_check.rc != 0

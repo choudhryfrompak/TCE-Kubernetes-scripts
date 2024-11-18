@@ -2,9 +2,9 @@
 
 # All Kubernetes nodes
 [all]
-k8s-master
-k8s-worker1
-k8s-worker2
+control-plane
+worker1
+worker2
 
 # Primary control plane node
 [master_main]
@@ -12,19 +12,19 @@ k8s-master
 
 # All master nodes
 [masters]
-k8s-master
+control-plane
 
 # All worker nodes
 [workers]
-k8s-worker1
-k8s-worker2
+worker1
+worker2
 
 # Common variables for all nodes
 [all:vars]
 ansible_user=ubuntu
 ansible_become=yes
 ansible_become_method=sudo
-ansible_ssh_private_key_file=/path/to/your-aws-key.pem
+ansible_ssh_private_key_file=
 
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 

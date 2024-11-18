@@ -1,5 +1,3 @@
-I'll document the complete process of creating and publishing a Helm chart from scratch:
-
 # Complete Helm Chart Creation and Publishing Guide
 
 ## 1. Initial Chart Creation
@@ -211,5 +209,3 @@ Remember to always:
 3. Keep documentation updated
 4. Maintain both source (main branch) and packaged (gh-pages branch) versions
 5. Follow semantic versioning for chart versions
-
-Would you like me to elaborate on any of these sections?

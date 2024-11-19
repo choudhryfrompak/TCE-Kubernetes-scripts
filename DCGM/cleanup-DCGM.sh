@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit on any error
+set -e
+
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -19,105 +22,148 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Function to safely delete helm releases
+# Function to check if a command exists
+check_command() {
+    if ! command -v $1 &> /dev/null; then
+        log_error "$1 is required but not installed. Please install it first."
+        exit 1
+    fi
+}
+
+# Function to safely delete a helm release
 delete_helm_release() {
-    local release=$1
-    local namespace=${2:-default}
+    local namespace=$1
+    local release=$2
 
-    if helm list -n "$namespace" | grep -q "^$release"; then
-        log_info "Removing Helm release: $release from namespace $namespace"
-        helm uninstall "$release" -n "$namespace" || log_warn "Failed to uninstall $release"
+    if helm list -n $namespace | grep -q $release; then
+        log_info "Uninstalling Helm release: $release from namespace: $namespace"
+        helm uninstall $release -n $namespace
+        return 0
     else
-        log_info "Helm release $release not found in namespace $namespace"
+        log_warn "Helm release $release not found in namespace $namespace"
+        return 1
     fi
 }
 
-# Function to safely delete kubernetes resources
-delete_k8s_resource() {
-    local resource_type=$1
-    local resource_name=$2
-    local namespace=${3:-default}
+# Function to safely delete a namespace
+delete_namespace() {
+    local namespace=$1
 
-    if kubectl get "$resource_type" -n "$namespace" 2>/dev/null | grep -q "$resource_name"; then
-        log_info "Removing $resource_type: $resource_name from namespace $namespace"
-        kubectl delete "$resource_type" "$resource_name" -n "$namespace" || log_warn "Failed to delete $resource_type $resource_name"
+    if kubectl get namespace $namespace &> /dev/null; then
+        log_info "Deleting namespace: $namespace"
+        kubectl delete namespace $namespace --timeout=60s
+
+        # Wait for namespace deletion
+        local retries=30
+        while kubectl get namespace $namespace &> /dev/null && [ $retries -gt 0 ]; do
+            log_warn "Waiting for namespace $namespace to be deleted... ($retries attempts remaining)"
+            sleep 2
+            ((retries--))
+        done
+
+        if [ $retries -eq 0 ]; then
+            log_warn "Namespace $namespace deletion timed out. You may need to check it manually."
+        else
+            log_info "Namespace $namespace successfully deleted"
+        fi
+    else
+        log_warn "Namespace $namespace not found"
     fi
 }
 
-log_info "Starting cleanup of telemetry components..."
+# Function to remove CRDs
+remove_crds() {
+    log_info "Removing Prometheus Operator CRDs..."
 
-# List current state
-log_info "Current Helm releases:"
-helm list -A
+    local crds=(
+        "alertmanagerconfigs.monitoring.coreos.com"
+        "alertmanagers.monitoring.coreos.com"
+        "podmonitors.monitoring.coreos.com"
+        "probes.monitoring.coreos.com"
+        "prometheuses.monitoring.coreos.com"
+        "prometheusrules.monitoring.coreos.com"
+        "servicemonitors.monitoring.coreos.com"
+        "thanosrulers.monitoring.coreos.com"
+    )
 
-log_info "Current pods in prometheus namespace:"
-kubectl get pods -n prometheus || true
+    for crd in "${crds[@]}"; do
+        if kubectl get crd $crd &> /dev/null; then
+            log_info "Removing CRD: $crd"
+            kubectl delete crd $crd
+        fi
+    done
+}
+
+# Check prerequisites
+log_info "Checking prerequisites..."
+check_command kubectl
+check_command helm
+
+# Print warning
+echo -e "${RED}"
+echo "⚠️  WARNING: This script will remove all GPU monitoring components and their data ⚠️"
+echo "This includes:"
+echo "  - DCGM Exporter"
+echo "  - Prometheus Stack"
+echo "  - All associated Custom Resource Definitions"
+echo "  - All monitoring data"
+echo -e "${NC}"
+
+# Prompt for confirmation
+read -p "Are you sure you want to proceed? (y/N) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    log_info "Cleanup cancelled"
+    exit 0
+fi
+
+# Start cleanup process
+log_info "Starting cleanup process..."
 
 # Remove DCGM exporter
 log_info "Removing DCGM exporter..."
-delete_helm_release "dcgm-exporter"
+delete_helm_release default dcgm-exporter-release || true
 
 # Remove Prometheus stack
 log_info "Removing Prometheus stack..."
-delete_helm_release "kube-prometheus-stack" "prometheus"
+delete_helm_release prometheus kube-prometheus-stack || true
 
-# Remove any leftover services
-log_info "Removing leftover services in prometheus namespace..."
-kubectl delete svc --all -n prometheus 2>/dev/null || true
-
-# Remove any leftover pods
-log_info "Removing leftover pods in prometheus namespace..."
-kubectl delete pods --all -n prometheus 2>/dev/null || true
-
-# Remove any leftover PVCs
-log_info "Removing leftover PVCs in prometheus namespace..."
-kubectl delete pvc --all -n prometheus 2>/dev/null || true
-
-# Remove any leftover configmaps
-log_info "Removing leftover configmaps in prometheus namespace..."
-kubectl delete configmap --all -n prometheus 2>/dev/null || true
-
-# Remove any leftover secrets
-log_info "Removing leftover secrets in prometheus namespace..."
-kubectl delete secret --all -n prometheus 2>/dev/null || true
-
-# Remove the prometheus namespace itself
-log_info "Removing prometheus namespace..."
-kubectl delete namespace prometheus --timeout=60s 2>/dev/null || true
+# Remove namespaces
+log_info "Removing namespaces..."
+delete_namespace prometheus
 
 # Remove CRDs
-log_info "Removing Prometheus CRDs..."
-kubectl delete crd alertmanagerconfigs.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd alertmanagers.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd podmonitors.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd probes.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd prometheuses.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd prometheusrules.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd servicemonitors.monitoring.coreos.com 2>/dev/null || true
-kubectl delete crd thanosrulers.monitoring.coreos.com 2>/dev/null || true
+remove_crds
 
-# Wait a bit to ensure everything is cleaned up
-sleep 10
+# Remove Helm repositories (optional)
+log_info "Removing Helm repositories..."
+helm repo remove prometheus-community 2>/dev/null || true
+helm repo remove gpu-helm-charts 2>/dev/null || true
 
-# Verify cleanup
-log_info "Verifying cleanup..."
+# Final cleanup status
+log_info "Checking for any remaining resources..."
 
 # Check for any remaining pods
-REMAINING_PODS=$(kubectl get pods -A | grep -E 'prometheus|dcgm-exporter' || true)
-if [ ! -z "$REMAINING_PODS" ]; then
-    log_warn "Some pods still remain:"
-    echo "$REMAINING_PODS"
-else
-    log_info "All relevant pods have been removed"
+remaining_pods=$(kubectl get pods -A | grep -E 'prometheus|dcgm-exporter' || true)
+if [ ! -z "$remaining_pods" ]; then
+    log_warn "Some monitoring-related pods are still present:"
+    echo "$remaining_pods"
+    log_warn "You may need to remove these manually"
 fi
 
-# Check for remaining helm releases
-REMAINING_RELEASES=$(helm list -A | grep -E 'prometheus|dcgm-exporter' || true)
-if [ ! -z "$REMAINING_RELEASES" ]; then
-    log_warn "Some Helm releases still remain:"
-    echo "$REMAINING_RELEASES"
-else
-    log_info "All relevant Helm releases have been removed"
-fi
+# Print completion message
+cat << EOF
 
-log_info "Cleanup complete!"
+🧹 Cleanup Complete! 🧹
+
+The following components have been removed:
+- DCGM Exporter
+- Prometheus Stack
+- Associated CRDs and resources
+- Monitoring namespaces
+
+Note: If you see any warnings above, some components may require manual cleanup.
+To manually remove any stuck resources, you can use:
+  kubectl delete pod <pod-name> -n <namespace> --force --grace-period=0
+
+EOF

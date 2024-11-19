@@ -1,0 +1,127 @@
+---
+- name: Install Container Runtime with NVIDIA Support
+  hosts: all
+  become: true
+  
+  tasks:
+    # Install containerd
+    - name: Install required packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: yes
+        
+    - name: Create Docker keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+        
+    - name: Add Docker GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+        
+    - name: Add Docker repository
+      shell: |
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        tee /etc/apt/sources.list.d/docker.list > /dev/null
+        
+    - name: Install containerd
+      apt:
+        name: containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Install NVIDIA Container Toolkit
+      apt:
+        name: nvidia-container-toolkit
+        state: present
+        update_cache: yes
+        
+    # NVIDIA repository setup
+    - name: Download NVIDIA Container Toolkit GPG key
+      get_url:
+        url: https://nvidia.github.io/libnvidia-container/gpgkey
+        dest: /tmp/nvidia.gpg
+        mode: '0644'
+
+    - name: Import NVIDIA GPG key
+      shell: |
+        cat /tmp/nvidia.gpg | gpg --dearmor > /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+        chmod a+r /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+
+    - name: Add NVIDIA Container Toolkit repository
+      get_url:
+        url: https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list
+        dest: /tmp/nvidia-container-toolkit.list
+        mode: '0644'
+
+    - name: Configure NVIDIA repository with GPG key
+      shell: |
+        cat /tmp/nvidia-container-toolkit.list | \
+        sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+        tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+      args:
+        creates: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+    - name: Install NVIDIA Container Toolkit
+      apt:
+        name: nvidia-container-toolkit
+        state: present
+        update_cache: yes
+
+    # Configure containerd
+    - name: Create containerd config directory
+      file:
+        path: /etc/containerd
+        state: directory
+
+    - name: Generate default containerd config
+      shell: containerd config default > /etc/containerd/config.toml
+
+    - name: Configure NVIDIA runtime in containerd
+      command: nvidia-ctk runtime configure --runtime=containerd
+
+    - name: Backup containerd config
+      copy:
+        src: /etc/containerd/config.toml
+        dest: /etc/containerd/config.toml.bak
+        remote_src: yes
+
+    - name: Set NVIDIA as default runtime
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'default_runtime_name = "runc"'
+        replace: 'default_runtime_name = "nvidia"'
+
+    - name: Set NVIDIA container runtime
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'runtime = "runc"'
+        replace: 'runtime = "nvidia-container-runtime"'
+
+    - name: Set systemdcgroup
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+
+    # Cleanup temporary files
+    - name: Remove temporary GPG files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/docker.gpg
+        - /tmp/nvidia.gpg
+
+    - name: Restart containerd
+      service:
+        name: containerd
+        state: restarted

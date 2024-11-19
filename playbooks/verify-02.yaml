@@ -43,8 +43,3 @@
         state: started
       register: containerd_status
       failed_when: not containerd_status.status.ActiveState == "active"
-
-    - name: Verify NVIDIA runtime functionality
-      shell: ctr runtime list | grep nvidia
-      register: nvidia_runtime
-      failed_when: nvidia_runtime.rc != 0

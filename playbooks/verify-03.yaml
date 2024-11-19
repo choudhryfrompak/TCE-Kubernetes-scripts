@@ -27,7 +27,6 @@
         - kubelet
         - kubeadm
         - kubectl
-        - containerd
       failed_when: hold_status.rc != 0
 
     - name: Verify kubectl functionality

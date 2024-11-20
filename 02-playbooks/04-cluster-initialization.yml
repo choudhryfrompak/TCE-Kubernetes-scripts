@@ -4,6 +4,15 @@
   become: true
   
   tasks:
+    - name: remove any exisiting configs
+      command: rm -rf /etc/cni/
+
+    - name: reset kubeadm
+      command: kubeadm reset --force
+
+    - name: Restart services
+      command: systemctl restart containerd.service kubelet.service
+
     - name: Pull required images
       command: kubeadm config images pull
       

@@ -21,7 +21,7 @@ spec:
         ports:
         - containerPort: 6379
           name: ray
-        - containerPort: 8000
+        - containerPort: 8080
           name: vllm
         resources:
           limits:
@@ -33,20 +33,21 @@ spec:
           mountPath: /root/.cache/huggingface
         - name: benchmarks
           mountPath: /vllm-workspace/examples
+        - name: dshm
+          mountPath: /dev/shm
         command:
           - "/bin/sh"
           - "-c"
           - |
-            ray start --head --port=6379 --block & 
-            sleep 120 && 
+            ray start --head --port=6379 --block &
+            sleep 30 &&
             python3 -m vllm.entrypoints.openai.api_server \
               --port 8080 \
               --trust-remote-code \
               --served-model-name ministral \
-              --model /root/.cache/huggingface/hub/models--mistralai--Ministral-8B-Instruct-2410/ \
+              --model mistralai/Ministral-8B-Instruct-2410 \
               --gpu-memory-utilization 0.99 \
-              --tensor-parallel-size 1 \
-              --pipeline-parallel-size 2 \
+              --tensor-parallel-size 2 \
               --dtype half & \
             tail -f /dev/null
       volumes:
@@ -56,3 +57,7 @@ spec:
       - name: benchmarks
         hostPath:
           path: /root/TCE-Kubernetes-scripts/vllm-tensor-parallel/
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 25Gi

@@ -22,7 +22,7 @@ sampling_params = SamplingParams(temperature=0.8, top_p=0.95)
 
 # Set tensor parallelism per instance.
 tensor_parallel_size = 2
-pipeline_parallel_size = 1
+
 # Set number of instances. Each instance will use tensor_parallel_size GPUs.
 num_instances = 1
 
@@ -32,7 +32,7 @@ class LLMPredictor:
 
     def __init__(self):
         # Create an LLM.
-        self.llm = LLM(model="/root/.cache/huggingface/hub/models--mistralai--Ministral-8B-Instruct-2410/", tensor_parallel_size=tensor_parallel_size,pipeline_parallel_size=pipeline_parallel_size,  max_num_batched_tokens=24000, max_model_len=512, max_num_seqs=40, dtype="half")
+        self.llm = LLM(model="mistralai/Ministral-8B-Instruct-2410", tensor_parallel_size=tensor_parallel_size, max_num_batched_tokens=24000, max_model_len=512, max_num_seqs=40, dtype="half")
 
     def __call__(self, batch: Dict[str, np.ndarray]) -> Dict[str, list]:
         # Generate texts from the prompts.

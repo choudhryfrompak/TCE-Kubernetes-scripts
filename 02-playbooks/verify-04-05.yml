@@ -1,47 +1,47 @@
+
 ---
 - name: Verify Kubernetes Control Plane Initialization
- hosts: master_main
- become: true
- tasks:
-   - name: Check kubelet service status
-     service:
-       name: kubelet
-       state: started
-     register: kubelet_status
-     failed_when: not kubelet_status.status.ActiveState == "active"
+  hosts: master_main
+  become: true
+  tasks:
+    - name: Check kubelet service status
+      service:
+        name: kubelet
+        state: started
+      register: kubelet_status
+      failed_when: not kubelet_status.status.ActiveState == "active"
 
-   - name: Verify kubeconfig exists
-     stat:
-       path: "{{ ansible_env.HOME }}/.kube/config"
-     register: kubeconfig
-     failed_when: not kubeconfig.stat.exists or kubeconfig.stat.mode != '0600'
+    - name: Verify kubeconfig exists
+      stat:
+        path: "{{ ansible_env.HOME }}/.kube/config"
+      register: kubeconfig
+      failed_when: not kubeconfig.stat.exists or kubeconfig.stat.mode != '0600'
 
-   - name: Check control plane pods
-     shell: "kubectl get pods -n kube-system | grep -E 'kube-apiserver|kube-controller|kube-scheduler|etcd'"
-     register: control_plane_pods
-     failed_when: control_plane_pods.rc != 0
+    - name: Check control plane pods
+      shell: "kubectl get pods -n kube-system | grep -E 'kube-apiserver|kube-controller|kube-scheduler|etcd'"
+      register: control_plane_pods
+      failed_when: control_plane_pods.rc != 0
 
-   - name: Verify Calico installation
-     shell: kubectl get pods -n calico-system
-     register: calico_pods
-     failed_when: calico_pods.rc != 0 or 'Running' not in calico_pods.stdout
+    - name: Verify Calico installation
+      shell: kubectl get pods -n calico-system
+      register: calico_pods
+      failed_when: calico_pods.rc != 0 or 'Running' not in calico_pods.stdout
 
-   - name: Check network CIDR configuration
-     shell: kubectl get ippool -o yaml | grep "cidr: 10.244.0.0/16"
-     register: cidr_check
-     failed_when: cidr_check.rc != 0
+    - name: Check network CIDR configuration
+      shell: kubectl get ippool -o yaml | grep "cidr: 10.244.0.0/16"
+      register: cidr_check
+      failed_when: cidr_check.rc != 0
 
-   - name: Verify NVIDIA device plugin
-     shell: kubectl get daemonset nvidia-device-plugin-daemonset -n kube-system
-     register: nvidia_plugin
-     failed_when: nvidia_plugin.rc != 0
+    - name: Verify NVIDIA device plugin
+      shell: kubectl get daemonset nvidia-device-plugin-daemonset -n kube-system
+      register: nvidia_plugin
+      failed_when: nvidia_plugin.rc != 0
 
-   - name: Check node GPU status
-     shell: kubectl describe node | grep nvidia.com/gpu
-     register: gpu_status
-     failed_when: gpu_status.rc != 0
+    - name: Check node GPU status
+      shell: kubectl describe node | grep nvidia.com/gpu
+      register: gpu_status
+      failed_when: gpu_status.rc != 0
 
-   - name: Verify cluster communication
-     shell: kubectl get nodes
-     register: nodes_status
-     failed_when: "'Ready' not in nodes_status.stdout"
+    - name: Verify cluster communication
+      shell: kubectl get nodes
+      register: nodes_status

@@ -37,13 +37,7 @@
         name: containerd.io
         state: present
         update_cache: yes
-
-    - name: Install NVIDIA Container Toolkit
-      apt:
-        name: nvidia-container-toolkit
-        state: present
-        update_cache: yes
-        
+     
     # NVIDIA repository setup
     - name: Download NVIDIA Container Toolkit GPG key
       get_url:

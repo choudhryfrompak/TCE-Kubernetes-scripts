@@ -53,4 +53,4 @@ spec:
           path: /root/.cache/huggingface
       - name: benchmarks
         hostPath:
-          path: /root/TCE-Kubernetes-scripts/vllm-tensor-parallel/
+          path: /root/TCE-Kubernetes-scripts/benchmark-scripts/

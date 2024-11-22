@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  webapp:
+    image: mycompany/webapp:latest
+    environment:
+      - DB_PASSWORD=dummy_password
+      - API_KEY=dummy_api_key
+      - AWS_ACCESS_KEY=dummy_aws_access_key
+      - AWS_SECRET_KEY=dummy_aws_secret_key
+    ports:
+      - "3000:3000"
+    volumes:
+      - /dummy/certs:/app/certs
+      - /dummy/ssl:/ssl/private
+
+  database:
+    image: postgres:13
+    environment:
+      - POSTGRES_PASSWORD=dummy_db_password
+      - POSTGRES_USER=dummy_user
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

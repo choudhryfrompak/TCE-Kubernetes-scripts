@@ -1,0 +1,9 @@
+﻿services:
+  testapi:
+    image: testapi
+    build:
+      context: ../../../app/backend
+      dockerfile: ../../deployment/docker/CPU/Api.Dockerfile
+    ports:
+      - "8093:8081"
+      - ${API_HOST_PORT}:8080

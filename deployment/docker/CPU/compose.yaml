@@ -7,3 +7,10 @@
     ports:
       - "8093:8081"
       - ${API_HOST_PORT}:8080
+  testui:
+    image: testui
+    build:
+      context: ../../../app
+      dockerfile: ../deployment/docker/CPU/Ui.Dockerfile
+    ports:
+      - "8092:80"

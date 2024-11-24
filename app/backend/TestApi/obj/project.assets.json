@@ -86,6 +86,7 @@
       "packagesPath": "/Users/abannsunny/.nuget/packages/",
       "outputPath": "/Users/abannsunny/Contracting/TCEngine/TCE-Kubernetes-scripts/app/backend/TestApi/obj/",
       "projectStyle": "PackageReference",
+      "UsingMicrosoftNETSdk": false,
       "configFilePaths": [
         "/Users/abannsunny/.nuget/NuGet/NuGet.Config"
       ],
@@ -110,8 +111,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "all"
-      },
-      "SdkAnalysisLevel": "9.0.100"
+      }
     },
     "frameworks": {
       "net9.0": {

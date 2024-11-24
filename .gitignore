@@ -1,0 +1,114 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+bun.lockb
+
+node_modules
+dist
+dist-ssr
+*.local
+.turbo
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+# User-specific files
+*.rsuser
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (Mono Auto Generated)
+mono_crash.*
+
+# Mono auto generated files
+*.pidb
+
+# Auto-generated files
+*.tlog
+*.cache
+*.result
+*.out
+*.trx
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Aa][Rr][Mm]/ # ARM builds
+[Aa][Rr][Mm]64/
+[Bb][Ii][Nn]/
+[Oo][Bb][Jj]/
+[Oo][Uu][Tt]/
+[Ww][Rr][Aa][Pp]/
+[Ww][Ii][Nn]32[Aa][Ll][Ii][Gg][Nn]/ # Windows alignment files
+[Ww][Ii][Nn]64[Aa][Ll][Ii][Gg][Nn]/
+*.[Ww][Ii][Nn]32[Aa][Ll][Ii][Gg][Nn]
+*.[Ww][Ii][Nn]64[Aa][Ll][Ii][Gg][Nn]
+![Ww][Ii][Nn]32[Aa][Ll][Ii][Gg][Nn]/
+![Ww][Ii][Nn]64[Aa][Ll][Ii][Gg][Nn]/
+
+# Roslyn auto generated files
+[Rr][Oo][Ss][Ll][Yy][Nn]_*/
+
+# Certificates
+*.pfx
+*.key
+
+# Visual Studio Code
+.vscode/
+
+# Package files
+*.nupkg
+*.snupkg
+*.symbols.nupkg
+*.symbols.snupkg
+*.cab
+*.msix
+
+# Windows image file caches
+Thumbs.db
+Desktop.ini
+
+# Windows crash files
+*.stackdump
+
+# NetBeans generated files
+nbproject/private/
+
+# Precompiled Headers
+*.pch
+*.gch
+
+# Windows Installer files
+*.msi
+*.msm
+*.msp
+
+# VS Code auto generated files
+!.vscode/*.json
+!.vscode/*.code-workspace
+
+# Rider auto generated files
+.idea/
+
+# Rider & ReSharper auto generated files
+*.sln.iml
+/secrets/*.txt
+*/**/tsconfig.app.tsbuildinfo
+*/**/tsconfig.node.tsbuildinfo

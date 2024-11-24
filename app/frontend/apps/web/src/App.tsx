@@ -5,7 +5,7 @@ import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
-  console.log("api url", import.meta.env.VITE_API_URL);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   return (
     <>
@@ -28,6 +28,9 @@ function App() {
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
+      </p>
+      <p>
+        This value is from config: {apiUrl}
       </p>
     </>
   );

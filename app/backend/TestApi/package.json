@@ -1,0 +1,8 @@
+{
+  "name": "backend-api",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build:dotnet": "dotnet build TestApi.csproj --configuration Release"
+  }
+}

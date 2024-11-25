@@ -1,0 +1,20 @@
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+RUN ls
+# Define the build argument
+ARG ConnectionStrings__TestContext
+
+RUN dotnet tool install --global dotnet-ef
+# Set the PATH to include the dotnet tools
+ENV PATH="$PATH:/root/.dotnet/tools"
+COPY . /src
+RUN dotnet restore "/src/TestApi.Migrations/TestApi.Migrations.csproj"
+
+WORKDIR /src/TestApi.Migrations
+RUN dotnet build "TestApi.Migrations.csproj" -o /app/build
+RUN dotnet tool restore
+
+CMD dotnet ef migrations bundle --self-contained -r linux-x64 --verbose --force && \
+    ./efbundle --connection "$ConnectionStrings__TestContext"
+    #  && \
+    # tail -f /dev/null

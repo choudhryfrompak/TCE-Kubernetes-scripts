@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		compose.yaml = compose.yaml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApi.Migrations", "TestApi.Migrations\TestApi.Migrations.csproj", "{FB4FCFE8-0E31-43B5-8458-18C40756CC14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApi.Domain", "TestApi.Domain\TestApi.Domain.csproj", "{C8767AB4-CFFD-49B6-8CD7-91528CC0C6D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,5 +21,13 @@ Global
 		{9FD92068-12C3-43B9-AAA4-7381F4BDDA30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FD92068-12C3-43B9-AAA4-7381F4BDDA30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FD92068-12C3-43B9-AAA4-7381F4BDDA30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB4FCFE8-0E31-43B5-8458-18C40756CC14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB4FCFE8-0E31-43B5-8458-18C40756CC14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB4FCFE8-0E31-43B5-8458-18C40756CC14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB4FCFE8-0E31-43B5-8458-18C40756CC14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8767AB4-CFFD-49B6-8CD7-91528CC0C6D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8767AB4-CFFD-49B6-8CD7-91528CC0C6D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8767AB4-CFFD-49B6-8CD7-91528CC0C6D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8767AB4-CFFD-49B6-8CD7-91528CC0C6D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

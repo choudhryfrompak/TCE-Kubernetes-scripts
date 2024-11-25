@@ -1,16 +1,70 @@
 ﻿services:
   testapi:
     image: testapi
+    container_name: testapi
     build:
       context: ../../../app/backend
       dockerfile: ../../deployment/docker/CPU/Api.Dockerfile
     ports:
       - "8093:8081"
       - ${API_HOST_PORT}:8080
+    networks:
+      - test-network
+    env_file:
+      - .env
+
   testui:
     image: testui
+    container_name: testui
     build:
       context: ../../../app
       dockerfile: ../deployment/docker/CPU/Ui.Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
     ports:
       - "8092:80"
+    networks:
+      - test-network
+    env_file:
+      - .env
+
+  test-pg-db:
+    image: postgres:13
+    container_name: test-pg-db
+    restart: always
+    ports:
+      - 5488:5432
+    volumes:
+      - ${SQL_Pg_Data_Folder}/data:/var/lib/postgresql/data
+    networks:
+      - test-network
+    env_file:
+      - .env
+
+  test-db-migrate:
+    platform: linux/amd64
+    container_name: test-db-migrate
+    build:
+      context: ../../../app/backend
+      dockerfile: ../../deployment/docker/CPU/Dockerfile.database.migrate
+    networks:
+      - test-network
+    depends_on: [ test-pg-db ]
+    env_file:
+      - .env
+
+  test-pg-db-seed:
+    container_name: test-pg-db-seed
+    platform: linux/amd64
+    build:
+      context: ../../../app/backend
+      dockerfile: ../../deployment/docker/CPU/Dockerfile.database.seed
+    networks:
+      - test-network
+    depends_on: [ test-pg-db, test-db-migrate ]
+    env_file:
+      - .env
+
+networks:
+  test-network:
+    driver: bridge

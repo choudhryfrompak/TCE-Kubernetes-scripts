@@ -1,4 +1,4 @@
-```markdown
+
 # Project Structure Overview
 
 ## Application Source Structure

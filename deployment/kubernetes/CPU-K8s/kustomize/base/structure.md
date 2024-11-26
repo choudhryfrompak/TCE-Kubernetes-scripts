@@ -160,4 +160,3 @@ This structure allows for:
 - Easy transition between Docker and Kubernetes
 - Consistent configuration management
 - Scalable deployment options
-```

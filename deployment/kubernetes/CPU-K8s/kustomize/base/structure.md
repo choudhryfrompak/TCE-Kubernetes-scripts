@@ -1,4 +1,4 @@
-```markdown
+
 # Project Structure Overview
 
 ## Application Source Structure
@@ -160,4 +160,3 @@ This structure allows for:
 - Easy transition between Docker and Kubernetes
 - Consistent configuration management
 - Scalable deployment options
-```

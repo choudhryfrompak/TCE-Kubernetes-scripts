@@ -20,6 +20,8 @@ importers:
 
   backend/TestApi: {}
 
+  backend/TestConsoleApp: {}
+
   frontend/apps/web:
     dependencies:
       react:

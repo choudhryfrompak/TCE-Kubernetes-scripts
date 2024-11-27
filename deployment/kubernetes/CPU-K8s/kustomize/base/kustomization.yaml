@@ -18,6 +18,8 @@ resources:
   - volumes/postgres-pvc.yaml
   - networking/ingress.yaml
   - networking/network-policies.yaml
+  - deployments/console-deployment.yaml
+  - configmaps/console-config.yaml
 
 # configMapGenerator:
 #   - name: api-config

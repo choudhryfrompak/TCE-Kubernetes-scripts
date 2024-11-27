@@ -33,6 +33,7 @@ CPU-K8s/
 ├── base/                # Base Kubernetes Configurations
 │   ├── configmaps/     # Configuration Files
 │   │   ├── api-config.yaml
+│   │   ├── console-config.yaml
 │   │   ├── ui-config.yaml
 │   │   └── appsettings.json
 │   ├── secrets/        # Sensitive Data
@@ -45,6 +46,7 @@ CPU-K8s/
 │   ├── deployments/    # Main Components
 │   │   ├── api-deployment.yaml   # Uses dotnet sdk:9.0 base image
 │   │   ├── ui-deployment.yaml    # Uses node:20.18-alpine base image
+│   │   ├── console-deployment.yaml #Uses mcr.microsoft.com/dotnet/sdk:9.0 base image
 │   │   └── db-deployment.yaml    # Uses postgres:13
 │   ├── jobs/           # One-time Operations
 │   │   ├── db-migration-job.yaml

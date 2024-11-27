@@ -39,6 +39,12 @@
     },
     "build:api": {
       "cache": true
+    },
+    "publish:console":{
+      "cache": true,
+      "outputs": [
+        "bin/Release/**"
+      ]
     }
   }
 }

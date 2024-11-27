@@ -1,0 +1,8 @@
+# base/configmaps/console-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: console-config
+data:
+  FileConfig__InputFolder: "/input"
+  FileConfig__OutputFolder: "/output"

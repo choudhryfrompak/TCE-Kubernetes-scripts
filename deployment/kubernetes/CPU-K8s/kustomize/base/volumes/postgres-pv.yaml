@@ -4,9 +4,9 @@ metadata:
   name: postgres-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 100Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data/postgres"
+    path: "/root/data/postgres"
   storageClassName: standard

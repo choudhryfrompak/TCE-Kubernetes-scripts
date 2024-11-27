@@ -65,6 +65,21 @@
     env_file:
       - .env
 
+  testconsole:
+    image: testconsole
+    platform: linux/amd64
+    container_name: testconsole
+    build:
+      context: ../../../app/backend
+      dockerfile: ../../deployment/docker/CPU/Dockerfile.console
+    networks:
+      - test-network
+    volumes:
+      - ${Host_FileConfig_Input}:${FileConfig__InputFolder}
+      - ${Host_FileConfig_Output}:${FileConfig__OutputFolder}
+    env_file:
+      - .env
+
 networks:
   test-network:
     driver: bridge

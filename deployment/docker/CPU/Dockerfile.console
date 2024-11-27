@@ -1,0 +1,18 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["TestConsoleApp/TestConsoleApp.csproj", "TestConsoleApp/"]
+RUN dotnet restore "TestConsoleApp/TestConsoleApp.csproj"
+COPY . .
+WORKDIR "/src/TestConsoleApp"
+RUN dotnet build "TestConsoleApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "TestConsoleApp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM build AS final
+USER $APP_UID
+WORKDIR /app
+COPY --from=publish /app/publish .
+CMD ["tail", "-f", "/dev/null"]

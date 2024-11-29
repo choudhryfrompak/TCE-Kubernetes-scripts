@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: test-pg-db
+ name: test-pg-db
 spec:
-  ports:
-  - port: 5432
-    targetPort: 5432
-  selector:
-    app: test-pg-db
+ type: NodePort
+ ports:
+ - port: 5432
+   targetPort: 5432
+   nodePort: 30268
+ selector:
+   app: test-pg-db

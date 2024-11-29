@@ -1,53 +1,57 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
- name: api-network-policy
+  name: api-network-policy
 spec:
- podSelector:
-   matchLabels:
-     app: testapi
- policyTypes:
- - Ingress
- - Egress
- ingress:
- - from:
-   - podSelector:
-       matchLabels:
-         app: testui
-   ports:
-   - protocol: TCP
-     port: 8080
- egress:
- - to:
-   - podSelector:
-       matchLabels:
-         app: test-pg-db
-   ports:
-   - protocol: TCP
-     port: 5432
+  podSelector:
+    matchLabels:
+      app: testapi
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: testui
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: test-pg-db
+    ports:
+    - protocol: TCP
+      port: 5432
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
- name: db-network-policy
+  name: db-network-policy
 spec:
- podSelector:
-   matchLabels:
-     app: test-pg-db
- policyTypes:
- - Ingress
- ingress:
- - from:
-   - podSelector:
-       matchLabels:
-         app: testapi
-   - podSelector:
-       matchLabels:
-         job-name: test-db-migrate
-   - podSelector:
-       matchLabels:
-         job-name: test-db-seed
-   ports:
-   - protocol: TCP
-     port: 5432
+  podSelector:
+    matchLabels:
+      app: test-pg-db
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: testapi
+    - podSelector:
+        matchLabels:
+          job-name: test-db-migrate
+    - podSelector:
+        matchLabels:
+          job-name: test-db-seed
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 5432

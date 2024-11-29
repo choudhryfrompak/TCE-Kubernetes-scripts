@@ -1,16 +1,17 @@
-# services/api-service.yaml - Updated ports to match our image
 apiVersion: v1
 kind: Service
 metadata:
-  name: testapi
+ name: testapi
 spec:
-  type: ClusterIP
-  ports:
-  - name: http
-    port: 8080
-    targetPort: 8080
-  - name: https
-    port: 8081
-    targetPort: 8081
-  selector:
-    app: testapi
+ type: NodePort
+ ports:
+ - name: http
+   port: 8080
+   targetPort: 8080
+   nodePort: 31178
+ - name: https
+   port: 8081
+   targetPort: 8081
+   nodePort: 30161
+ selector:
+   app: testapi

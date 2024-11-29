@@ -17,8 +17,6 @@ resources:
 - networking/ingress.yaml
 - networking/network-policies.yaml
 - volumes/postgres-pv.yaml
-- volumes/postgres-pvc.yaml
-
 secretGenerator:
 - name: api-secrets
   files:

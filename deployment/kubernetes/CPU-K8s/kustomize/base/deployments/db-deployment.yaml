@@ -1,48 +1,49 @@
-# deployments/db-deployment.yaml
+# db-deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: test-pg-db
+ name: test-pg-db
 spec:
-  serviceName: test-pg-db
-  replicas: 1
-  selector:
-    matchLabels:
-      app: test-pg-db
-  template:
-    metadata:
-      labels:
-        app: test-pg-db
-    spec:
-      containers:
-      - name: postgres
-        image: postgres:13
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: POSTGRES_PASSWORD
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: POSTGRES_DB
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-  - metadata:
-      name: postgres-storage
-    spec:
-      accessModes: [ "ReadWriteMany" ]
-      resources:
-        requests:
-          storage: 100Gi
+ serviceName: test-pg-db
+ replicas: 1
+ selector:
+   matchLabels:
+     app: test-pg-db
+ template:
+   metadata:
+     labels:
+       app: test-pg-db
+   spec:
+     containers:
+     - name: postgres
+       image: postgres:13
+       ports:
+       - containerPort: 5432
+       env:
+       - name: POSTGRES_USER
+         valueFrom:
+           secretKeyRef:
+             name: db-credentials
+             key: POSTGRES_USER
+       - name: POSTGRES_PASSWORD
+         valueFrom:
+           secretKeyRef:
+             name: db-credentials
+             key: POSTGRES_PASSWORD
+       - name: POSTGRES_DB
+         valueFrom:
+           secretKeyRef:
+             name: db-credentials
+             key: POSTGRES_DB
+       volumeMounts:
+       - name: postgres-storage
+         mountPath: /var/lib/postgresql/data
+ volumeClaimTemplates:
+ - metadata:
+     name: postgres-storage
+   spec:
+     accessModes: [ "ReadWriteOnce" ]
+     storageClassName: standard
+     resources:
+       requests:
+         storage: 100Gi

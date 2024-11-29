@@ -18,3 +18,8 @@ configMapGenerator:
     literals:
       - Host_FileConfig_Input=/root/testconsole
       - Host_FileConfig_Output=/root/testconsole/outd
+
+patchesStrategicMerge:
+  # Add environment specific patches here
+  # - patches/increase-replica-count.yaml
+  # - patches/set-resource-limits.yaml

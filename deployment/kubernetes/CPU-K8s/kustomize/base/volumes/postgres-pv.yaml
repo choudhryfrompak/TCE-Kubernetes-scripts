@@ -1,12 +1,13 @@
+# postgres-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv
+ name: postgres-storage-test-pg-db-0
 spec:
-  capacity:
-    storage: 100Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/root/data/postgres"
-  storageClassName: standard
+ capacity:
+   storage: 100Gi
+ accessModes:
+   - ReadWriteOnce
+ hostPath:
+   path: "/root/data/postgres"
+ storageClassName: standard

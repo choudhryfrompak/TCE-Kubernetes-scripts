@@ -1,4 +1,3 @@
-# services/api-service.yaml - Updated ports to match our image
 apiVersion: v1
 kind: Service
 metadata:

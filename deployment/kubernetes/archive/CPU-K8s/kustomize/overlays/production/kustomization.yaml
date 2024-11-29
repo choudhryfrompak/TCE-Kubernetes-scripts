@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base
+
+namespace: production
+
+configMapGenerator:
+  - name: api-config
+    behavior: merge
+    literals:
+      - AllowedWebsites=https://test.production.domain
+  - name: ui-config
+    behavior: merge
+    literals:
+      - VITE_API_URL=https://test.production.domain/api
+
+patches:
+  - target:
+      kind: Deployment
+      name: testapi
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+  - target:
+      kind: Deployment
+      name: testui
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2

@@ -1,4 +1,3 @@
-# jobs/db-seed-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -8,7 +7,13 @@ spec:
     spec:
       containers:
       - name: db-seed
-        image: choudhry2272/cpu-test-pg-db-seed:latest
+        image: postgres:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          apt-get update && 
+          apt-get install -y postgresql-client &&
+          /scripts/wait-and-run-pg.sh
         env:
         - name: POSTGRES_USER
           valueFrom:
@@ -25,4 +30,12 @@ spec:
             secretKeyRef:
               name: db-credentials
               key: POSTGRES_DB
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: scripts
+        hostPath:
+          path: /root/app/backend/scripts
+          type: Directory
       restartPolicy: OnFailure

@@ -1,3 +1,4 @@
+# db-migration-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -7,28 +8,11 @@ spec:
     spec:
       containers:
       - name: db-migrate
-        image: mcr.microsoft.com/dotnet/sdk:9.0
-        workingDir: /src/TestApi.Migrations
-        command: ["/bin/sh", "-c"]
-        args:
-        - |
-          dotnet tool install --global dotnet-ef &&
-          export PATH="$PATH:/root/.dotnet/tools" &&
-          dotnet restore &&
-          dotnet ef migrations bundle --self-contained -r linux-x64 --verbose --force &&
-          ./efbundle --connection "$ConnectionStrings__TestContext"
+        image: choudhry2272/cpu-test-db-migrate:latest
         env:
         - name: ConnectionStrings__TestContext
           valueFrom:
             secretKeyRef:
               name: api-secrets
               key: ConnectionStrings__TestContext
-        volumeMounts:
-        - name: api-source
-          mountPath: /src
-      volumes:
-      - name: api-source
-        hostPath:
-          path: /root/app/backend
-          type: Directory
       restartPolicy: OnFailure

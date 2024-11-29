@@ -1,8 +1,7 @@
+# configmaps/ui-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ui-config
 data:
-  UI_HOST_PORT: "3030"
-  API_HOST_PORT: "8090"
-  VITE_API_URL: "http://test.local/api"
+  VITE_API_URL: "http://testapi:8080"

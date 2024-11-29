@@ -1,0 +1,53 @@
+# base/deployments/console-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testconsole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testconsole
+  template:
+    metadata:
+      labels:
+        app: testconsole
+    spec:
+      containers:
+      - name: testconsole
+        image: mcr.microsoft.com/dotnet/sdk:9.0
+        workingDir: /src/TestConsoleApp
+        command: ["dotnet"]
+        args: ["watch", "run", "--no-restore"]
+        env:
+        - name: FileConfig__InputFolder
+          value: "/input"
+        - name: FileConfig__OutputFolder
+          value: "/output"
+        volumeMounts:
+        - name: console-source
+          mountPath: /src
+        - name: input-volume
+          mountPath: /input
+        - name: output-volume
+          mountPath: /output
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+      volumes:
+      - name: console-source
+        hostPath:
+          path: /root/app/backend
+          type: Directory
+      - name: input-volume
+        hostPath:
+          path: /root/testconsole
+          type: Directory
+      - name: output-volume
+        hostPath:
+          path: /root/testconsole/outd
+          type: Directory

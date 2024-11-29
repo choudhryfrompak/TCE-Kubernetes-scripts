@@ -1,15 +1,7 @@
+# configmaps/api-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: api-config
 data:
-  appsettings.json: |
-    {
-      "AllowedWebsites": "http://test.local",
-      "Logging": {
-        "LogLevel": {
-          "Default": "Information",
-          "Microsoft.AspNetCore": "Warning"
-        }
-      }
-    }
+  ASPNETCORE_ENVIRONMENT: "Development"

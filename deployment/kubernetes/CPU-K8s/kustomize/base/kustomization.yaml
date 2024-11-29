@@ -2,39 +2,29 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - configmaps/api-config.yaml
-  - configmaps/ui-config.yaml
-  - secrets/db-credentials.yaml
-  - secrets/api-secrets.yaml
-  - services/api-service.yaml
-  - services/ui-service.yaml
-  - services/db-service.yaml
-  - deployments/api-deployment.yaml
-  - deployments/ui-deployment.yaml
-  - deployments/db-deployment.yaml
-  - jobs/db-migration-job.yaml
-  - jobs/db-seed-job.yaml
-  - volumes/postgres-pv.yaml
-  - volumes/postgres-pvc.yaml
-  - networking/ingress.yaml
-  - networking/network-policies.yaml
-  - deployments/console-deployment.yaml
-  - configmaps/console-config.yaml
+- configmaps/api-config.yaml
+- configmaps/console-config.yaml
+- configmaps/ui-config.yaml
+- deployments/api-deployment.yaml
+- deployments/console-deployment.yaml
+- deployments/db-deployment.yaml
+- deployments/ui-deployment.yaml
+- jobs/db-migration-job.yaml
+- jobs/db-seed-job.yaml
+- services/api-service.yaml
+- services/db-service.yaml
+- services/ui-service.yaml
+- networking/ingress.yaml
+- networking/network-policies.yaml
+- volumes/postgres-pv.yaml
+- volumes/postgres-pvc.yaml
 
-# configMapGenerator:
-#   - name: api-config
-#     files:
-#       - configmaps/appsettings.json
-#   - name: ui-config
-#     literals:
-#       - VITE_API_URL=http://api-service:8080
-
-# secretGenerator:
-#   - name: db-credentials
-#     literals:
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=Test1234!
-# #       - POSTGRES_DB=test-db
-#   - name: api-secrets
-#     literals:
-#       - ConnectionStrings__TestContext=Host=test-pg-db;Port=5432;Database=test-db;Username=postgres;Password=Test1234!
+secretGenerator:
+- name: api-secrets
+  files:
+  - ConnectionStrings__TestContext=secrets/connection-string.txt
+- name: db-credentials
+  literals:
+  - POSTGRES_USER=testuser
+  - POSTGRES_PASSWORD=testpass
+  - POSTGRES_DB=testdb

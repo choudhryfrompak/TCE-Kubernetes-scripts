@@ -1,3 +1,4 @@
+# deployments/ui-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,49 +15,12 @@ spec:
     spec:
       containers:
       - name: testui
-        image: node:20.18-alpine
-        workingDir: /app
-        command: ["/bin/sh", "-c"]
-        args:
-        - |
-          corepack enable && 
-          corepack prepare pnpm@latest --activate &&
-          cd frontend &&
-          pnpm install &&
-          cd apps/web &&
-          pnpm dev --host 0.0.0.0
+        image: choudhry2272/testui:latest
         ports:
-        - containerPort: 3000
+        - containerPort: 80
         env:
         - name: VITE_API_URL
           valueFrom:
             configMapKeyRef:
               name: ui-config
               key: VITE_API_URL
-        volumeMounts:
-        - name: ui-source
-          mountPath: /app
-        resources:
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 20
-          periodSeconds: 15
-      volumes:
-      - name: ui-source
-        hostPath:
-          path: /root/app
-          type: Directory

@@ -52,7 +52,7 @@ class LLMPredictor:
 
 # Read one text file from S3. Ray Data supports reading multiple files
 # from cloud storage (such as JSONL, Parquet, CSV, binary format).
-ds = ray.data.read_text("/vllm-workspace/examples/prompts.txt")
+ds = ray.data.read_text("/vllm-workspace/prompts.txt")
 
 
 # For tensor_parallel_size > 1, we need to create placement groups for vLLM
@@ -64,7 +64,7 @@ def scheduling_strategy_fn():
             "GPU": 1,
             "CPU": 1
         }] * tensor_parallel_size,
-        strategy="STRICT_SPREAD",
+        strategy="STRICT_PACK",
     )
     return dict(scheduling_strategy=PlacementGroupSchedulingStrategy(
         pg, placement_group_capture_child_tasks=True))
@@ -87,14 +87,14 @@ ds = ds.map_batches(
     # Set the concurrency to the number of LLM instances.
     concurrency=num_instances,
     # Specify the batch size for inference.
-    batch_size=40,
+    batch_size=32,
     **resources_kwarg,
 )
 
 # Peek first 10 results.
 # NOTE: This is for local testing and debugging. For production use case,
 # one should write full result out as shown below.
-outputs = ds.take(limit=5800)
+outputs = ds.take(limit=10)
 for output in outputs:
     prompt = output["prompt"]
     generated_text = output["generated_text"]
@@ -104,4 +104,4 @@ for output in outputs:
 # Multiple files would be written to the output destination,
 # and each task would write one or more files separately.
 #
-#ds.write_parquet("responses.txt")
+# ds.write_parquet("s3://<your-output-bucket>")

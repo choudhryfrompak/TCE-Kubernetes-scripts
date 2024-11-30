@@ -6,10 +6,15 @@ services:
       context: .
       dockerfile: Dockerfile
     image: vllm-tensor:latest
+    user: root
+    environment:
+      - NCCL_DEBUG=INFO
+      - NCCL_SOCKET_IFNAME=eth0
     volumes:
-      - huggingface-cache:/root/.cache/huggingface
+      - /root/.cache/huggingface:/root/.cache/huggingface
+      - /dev/shm:/dev/shm
     runtime: nvidia
-    command: ["/vllm-app/start.sh"]
+    command: ["/vllm-workspace/start.sh"]
     deploy:
       resources:
         reservations:

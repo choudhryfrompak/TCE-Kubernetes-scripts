@@ -1,3 +1,10 @@
+"""
+This example shows how to use Ray Data for running offline batch inference
+distributively on a multi-nodes cluster.
+
+Learn more about Ray Data in https://docs.ray.io/en/latest/data/data.html
+"""
+
 from typing import Any, Dict, List
 
 import numpy as np
@@ -43,8 +50,9 @@ class LLMPredictor:
         }
 
 
+# Read one text file from S3. Ray Data supports reading multiple files
 # from cloud storage (such as JSONL, Parquet, CSV, binary format).
-ds = ray.data.read_text("/vllm-workspace/prompts.txt")
+ds = ray.data.read_text("/vllm-workspace/examples/prompts.txt")
 
 
 # For tensor_parallel_size > 1, we need to create placement groups for vLLM
@@ -56,7 +64,7 @@ def scheduling_strategy_fn():
             "GPU": 1,
             "CPU": 1
         }] * tensor_parallel_size,
-        strategy="STRICT_PACK",
+        strategy="STRICT_SPREAD",
     )
     return dict(scheduling_strategy=PlacementGroupSchedulingStrategy(
         pg, placement_group_capture_child_tasks=True))
@@ -86,7 +94,7 @@ ds = ds.map_batches(
 # Peek first 10 results.
 # NOTE: This is for local testing and debugging. For production use case,
 # one should write full result out as shown below.
-outputs = ds.take(limit=10)
+outputs = ds.take(limit=5800)
 for output in outputs:
     prompt = output["prompt"]
     generated_text = output["generated_text"]
@@ -96,4 +104,4 @@ for output in outputs:
 # Multiple files would be written to the output destination,
 # and each task would write one or more files separately.
 #
-# ds.write_parquet("s3://<your-output-bucket>")
+#ds.write_parquet("responses.txt")

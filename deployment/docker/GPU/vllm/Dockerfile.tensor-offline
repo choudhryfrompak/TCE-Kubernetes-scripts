@@ -1,0 +1,5 @@
+FROM vllm-base:latest
+
+ENV DEPLOYMENT_TYPE=tensor \
+    SERVING_TYPE=offline \
+    TENSOR_PARALLEL_SIZE=2

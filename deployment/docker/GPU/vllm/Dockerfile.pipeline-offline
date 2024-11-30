@@ -1,0 +1,4 @@
+FROM vllm-base:latest
+
+ENV DEPLOYMENT_TYPE=pipeline \
+    SERVING_TYPE=offline

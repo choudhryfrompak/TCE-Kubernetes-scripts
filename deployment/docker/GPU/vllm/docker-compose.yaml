@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  vllm-head:
+    build:
+      context: .
+      dockerfile: Dockerfile.${DEPLOYMENT_TYPE}-${SERVING_TYPE}
+    image: vllm-${DEPLOYMENT_TYPE}-${SERVING_TYPE}:latest
+    environment:
+      - RAY_PORT=${RAY_PORT:-6379}
+      - VLLM_PORT=${VLLM_PORT:-8000}
+      - GPU_MEM_UTIL=${GPU_MEM_UTIL:-0.99}
+      - MODEL_NAME=${MODEL_NAME:-mistralai/Ministral-8B-Instruct-2410}
+      - SERVED_MODEL_NAME=${SERVED_MODEL_NAME:-ministral}
+      - TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+      - PIPELINE_PARALLEL_SIZE=${PIPELINE_PARALLEL_SIZE:-1}
+      - USE_DTYPE=${USE_DTYPE:-half}
+    ports:
+      - "${RAY_PORT}:${RAY_PORT}"
+      - "${VLLM_PORT}:${VLLM_PORT}"
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+      - /dev/shm:/dev/shm
+    runtime: nvidia
+    command: ["/vllm-app/entrypoint-head.sh"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  vllm-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.${DEPLOYMENT_TYPE}-${SERVING_TYPE}
+    image: vllm-${DEPLOYMENT_TYPE}-${SERVING_TYPE}:latest
+    environment:
+      - RAY_PORT=${RAY_PORT:-6379}
+      - VLLM_PORT=${VLLM_PORT:-8000}
+      - HEAD_SERVICE_HOST=vllm-head
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    runtime: nvidia
+    command: ["/vllm-app/entrypoint-worker.sh"]
+    deploy:
+      mode: replicated
+      replicas: ${WORKER_REPLICAS:-1}
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - vllm-head
+
+volumes:
+  huggingface-cache:
+    driver: local

@@ -1,0 +1,27 @@
+FROM vllm/vllm-openai:latest
+
+# Install additional dependencies
+RUN apt-get update && apt-get install -y \
+    netcat \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /vllm-app
+
+# Copy entrypoint scripts
+COPY scripts/entrypoint-head.sh /vllm-app/
+COPY scripts/entrypoint-worker.sh /vllm-app/
+RUN chmod +x /vllm-app/entrypoint-*.sh
+
+# Default environment variables
+ENV RAY_PORT=6379 \
+    VLLM_PORT=8000 \
+    GPU_MEM_UTIL=0.99 \
+    MODEL_NAME="mistralai/Ministral-8B-Instruct-2410" \
+    SERVED_MODEL_NAME="ministral" \
+    HEAD_SERVICE_HOST="vllm-head" \
+    TENSOR_PARALLEL_SIZE=1 \
+    PIPELINE_PARALLEL_SIZE=1 \
+    USE_DTYPE="half"
+
+# Create cache directories
+RUN mkdir -p /root/.cache/huggingface

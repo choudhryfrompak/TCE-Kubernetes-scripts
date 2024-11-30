@@ -1,0 +1,5 @@
+FROM vllm-base:latest
+
+ENV DEPLOYMENT_TYPE=pipeline \
+    SERVING_TYPE=online \
+    VLLM_PORT=8080

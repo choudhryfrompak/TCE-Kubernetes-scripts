@@ -10,6 +10,8 @@ services:
     environment:
       - NCCL_DEBUG=INFO
       - NCCL_SOCKET_IFNAME=eth0
+      - NCCL_IGNORE_DISABLED_P2P=1
+      - NCCL_P2P_DISABLE=1
     volumes:
       - /root/.cache/huggingface:/root/.cache/huggingface
       - /dev/shm:/dev/shm

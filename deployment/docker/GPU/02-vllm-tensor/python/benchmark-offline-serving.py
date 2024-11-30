@@ -32,7 +32,7 @@ class LLMPredictor:
 
     def __init__(self):
         # Create an LLM.
-        self.llm = LLM(model="mistralai/Ministral-8B-Instruct-2410", tensor_parallel_size=tensor_parallel_size, max_num_batched_tokens=24000, max_model_len=512, max_num_seqs=40, dtype="half")
+        self.llm = LLM(model="mistralai/Ministral-8B-Instruct-2410", tensor_parallel_size=tensor_parallel_size, max_num_batched_tokens=24000, max_model_len=512, max_num_seqs=40, dtype="half", tokenizer-mode="mistral")
 
     def __call__(self, batch: Dict[str, np.ndarray]) -> Dict[str, list]:
         # Generate texts from the prompts.

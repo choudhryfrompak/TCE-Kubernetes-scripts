@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  vllm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vllm-tensor:latest
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    runtime: nvidia
+    command: ["/vllm-app/start.sh"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+
+volumes:
+  huggingface-cache:
+    driver: local

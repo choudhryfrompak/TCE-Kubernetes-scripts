@@ -1,3 +1,10 @@
+"""
+This example shows how to use Ray Data for running offline batch inference
+distributively on a multi-nodes cluster.
+
+Learn more about Ray Data in https://docs.ray.io/en/latest/data/data.html
+"""
+
 from typing import Any, Dict, List
 
 import numpy as np
@@ -25,7 +32,7 @@ class LLMPredictor:
 
     def __init__(self):
         # Create an LLM.
-        self.llm = LLM(model="mistralai/Ministral-8B-Instruct-2410", tensor_parallel_size=tensor_parallel_size, max_num_batched_tokens=24000, max_model_len=512, max_num_seqs=40, dtype="half")
+        self.llm = LLM(model="mistralai/Ministral-8B-Instruct-2410", tensor_parallel_size=tensor_parallel_size, max_num_batched_tokens=24000, max_model_len=512, max_num_seqs=40, dtype="half", tokenizer_mode="mistral")
 
     def __call__(self, batch: Dict[str, np.ndarray]) -> Dict[str, list]:
         # Generate texts from the prompts.
@@ -43,6 +50,7 @@ class LLMPredictor:
         }
 
 
+# Read one text file from S3. Ray Data supports reading multiple files
 # from cloud storage (such as JSONL, Parquet, CSV, binary format).
 ds = ray.data.read_text("/vllm-workspace/prompts.txt")
 
@@ -79,14 +87,14 @@ ds = ds.map_batches(
     # Set the concurrency to the number of LLM instances.
     concurrency=num_instances,
     # Specify the batch size for inference.
-    batch_size=40,
+    batch_size=32,
     **resources_kwarg,
 )
 
 # Peek first 10 results.
 # NOTE: This is for local testing and debugging. For production use case,
 # one should write full result out as shown below.
-outputs = ds.take(limit=10)
+outputs = ds.take(limit=5800)
 for output in outputs:
     prompt = output["prompt"]
     generated_text = output["generated_text"]

@@ -3,8 +3,8 @@ version: '3.8'
 services:
   vllm:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../../../../
+      dockerfile: /deployment/docker/GPU/vllm/02-vllm-tensor/Dockerfile
     image: vllm-tensor:latest
     user: root
     environment:

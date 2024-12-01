@@ -21,52 +21,23 @@
         
     - name: Apply Calico custom resources
       command: kubectl create -f /tmp/custom-resources.yaml
-      
-    # # NVIDIA Device Plugin Setup
-    # - name: Create NVIDIA device plugin manifest
-    #   copy:
-    #     content: |
-    #       apiVersion: apps/v1
-    #       kind: DaemonSet
-    #       metadata:
-    #         name: nvidia-device-plugin-daemonset
-    #         namespace: kube-system
-    #       spec:
-    #         selector:
-    #           matchLabels:
-    #             name: nvidia-device-plugin-ds
-    #         template:
-    #           metadata:
-    #             labels:
-    #               name: nvidia-device-plugin-ds
-    #           spec:
-    #             containers:
-    #             - name: nvidia-device-plugin-ctr
-    #               image: nvcr.io/nvidia/k8s-device-plugin:v0.14.3
-    #               env:
-    #                 - name: FAIL_ON_INIT_ERROR
-    #                   value: "false"
-    #               securityContext:
-    #                 allowPrivilegeEscalation: false
-    #                 capabilities:
-    #                   drop: ["ALL"]
-    #               volumeMounts:
-    #                 - name: device-plugin
-    #                   mountPath: /var/lib/kubelet/device-plugins
-    #             priorityClassName: system-node-critical
-    #             tolerations:
-    #               - key: nvidia.com/gpu
-    #                 operator: Exists
-    #                 effect: NoSchedule
-    #             volumes:
-    #               - name: device-plugin
-    #                 hostPath:
-    #                   path: /var/lib/kubelet/device-plugins
-    #     dest: /tmp/nvidia-device-plugin.yaml
-        
-    # - name: Apply NVIDIA device plugin
-    #   command: kubectl apply -f /tmp/nvidia-device-plugin.yaml
+
     - name: Apply calico latest
       command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
+
     - name: enable scheduling on control-plane
       command: kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/control-plane -o jsonpath='{.items[*].metadata.name}') node-role.kubernetes.io/control-plane:NoSchedule-
+
+    - name: Create standard storageclass
+      copy:
+        content: |
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            name: standard
+          provisioner: kubernetes.io/no-provisioner
+          volumeBindingMode: WaitForFirstConsumer
+        dest: /tmp/storageclass.yaml
+        
+    - name: Apply Storageclass
+      command: kubectl apply -f /tmp/storageclass.yaml

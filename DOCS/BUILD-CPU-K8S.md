@@ -131,14 +131,7 @@ If you need to add more nodes later:
 bash 02-playbooks/print-join-command.sh
 ```
 
-### 4. Network Configuration
-
-Install Calico network plugin:
-```bash
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-```
-
-### 5. Verify Cluster Setup
+### 4. Verify Cluster Setup
 
 Check node status:
 ```bash
@@ -153,14 +146,14 @@ systemctl restart containerd kubelet.service
 # Or restart all nodes if needed
 ```
 
-### 6. Additional Utilities
+### 5. Additional Utilities
 
-#### 6.1 Install Helm and Rancher
+#### 5.1 Install Helm and Rancher
 ```bash
 bash ../common/03-helm-and-rancher/setup-helm-and-rancher.sh
 ```
 
-#### 6.2 Verify Rancher Installation
+#### 5.2 Verify Rancher Installation
 ```bash
 kubectl get svc -n cattle-system
 ```

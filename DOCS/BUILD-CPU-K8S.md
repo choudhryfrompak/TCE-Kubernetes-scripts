@@ -89,36 +89,40 @@ sudo apt install ansible
 ```
 
 #### 3.2 Run Installation Playbooks
+Test connectivity:
+```bash
+ansible all -i ../common/01-inventory/hosts -m "ping"
+```
 
 Execute the following playbooks in order:
 
 1. System Network Configuration
 ```bash
-ansible-playbook -i ../common/hosts 02-playbooks/01-System-Network.yml
-ansible-playbook -i ../common/hosts 02-playbooks/verify-01.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/01-System-Network.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/verify-01.yml
 ```
 
 2. Container Runtime and Drivers
 ```bash
-ansible-playbook -i ../common/hosts 02-playbooks/02-container-runtime-drivers.yml
-ansible-playbook -i ../common/hosts 02-playbooks/verify-02.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/02-container-runtime-drivers.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/verify-02.yml
 ```
 
 3. Kubernetes Installation
 ```bash
-ansible-playbook -i ../common/hosts 02-playbooks/03-kubernetes-installation.yml
-ansible-playbook -i ../common/hosts 02-playbooks/verify-03.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/03-kubernetes-installation.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/verify-03.yml
 ```
 
 4. Cluster Initialization
 ```bash
-ansible-playbook -i ../common/hosts 02-playbooks/04-cluster-initialization.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/04-cluster-initialization.yml
 ```
 
 5. Post Installation Setup
 ```bash
-ansible-playbook -i ../common/hosts 02-playbooks/05-post-installation.yml
-ansible-playbook -i ../common/hosts 02-playbooks/verify-04-05.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/05-post-installation.yml
+ansible-playbook -i ../common/01-inventory/hosts 02-playbooks/verify-04-05.yml
 ```
 
 #### 3.3 Optional: Generate Join Command

@@ -1,4 +1,3 @@
-
 ---
 - name: Verify Kubernetes Control Plane Initialization
   hosts: master_main
@@ -28,19 +27,9 @@
       failed_when: calico_pods.rc != 0 or 'Running' not in calico_pods.stdout
 
     - name: Check network CIDR configuration
-      shell: kubectl get ippool -o yaml | grep "cidr: 10.244.0.0/16"
+      shell: "kubectl get ippool -o yaml | grep 'cidr: 10.244.0.0/16'"
       register: cidr_check
       failed_when: cidr_check.rc != 0
-
-    # - name: Verify NVIDIA device plugin
-    #   shell: kubectl get daemonset nvidia-device-plugin-daemonset -n kube-system
-    #   register: nvidia_plugin
-    #   failed_when: nvidia_plugin.rc != 0
-
-    # - name: Check node GPU status
-    #   shell: kubectl describe node | grep nvidia.com/gpu
-    #   register: gpu_status
-    #   failed_when: gpu_status.rc != 0
 
     - name: Verify cluster communication
       shell: kubectl get nodes

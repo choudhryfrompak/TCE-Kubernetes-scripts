@@ -39,6 +39,8 @@
         path: /etc/bash_completion.d/kubectl
       register: completion_file
       failed_when: not completion_file.stat.exists
+    - name: bash reload
+      shell: source ~/.bashrc
 
     - name: Verify bash completion source in bashrc
       shell: grep "source <(kubectl completion bash)" ~/.bashrc

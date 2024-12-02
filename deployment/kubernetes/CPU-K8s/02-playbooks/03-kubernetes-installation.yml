@@ -10,6 +10,9 @@
         state: directory
         mode: '0755'
 
+    - name: clean existing keys and repos
+      shell: rm -rf /etc/apt/keyrings/* && rm -rf /etc/apt/sources.list.d/kubernetes.list
+
     - name: Add Kubernetes GPG key
       get_url:
         url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key

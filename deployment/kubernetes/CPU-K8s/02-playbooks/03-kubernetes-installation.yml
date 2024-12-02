@@ -10,8 +10,14 @@
         state: directory
         mode: '0755'
 
-    - name: clean existing keys and repos
-      shell: rm -rf /etc/apt/keyrings/* && rm -rf /etc/apt/sources.list.d/kubernetes.list
+    - name: clean existing keys
+      shell: rm -rf /etc/apt/keyrings/*
+
+    - name: clean existing repos
+      shell: rm -rf /etc/apt/sources.list.d/*
+
+    - name: clean cni
+      shell: rm -rf /etc/cni
 
     - name: Add Kubernetes GPG key
       get_url:

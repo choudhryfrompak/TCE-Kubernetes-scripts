@@ -67,8 +67,8 @@
     - name: Apply NVIDIA device plugin
       command: kubectl apply -f /tmp/nvidia-device-plugin.yaml
  
-    - name: Apply calico latest
-      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
+    # - name: Apply calico latest
+    #   command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
 
     - name: enable scheduling on control-plane
       command: kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/control-plane -o jsonpath='{.items[*].metadata.name}') node-role.kubernetes.io/control-plane:NoSchedule-

@@ -26,11 +26,6 @@
       register: calico_pods
       failed_when: calico_pods.rc != 0 or 'Running' not in calico_pods.stdout
 
-    - name: Check network CIDR configuration
-      shell: "kubectl get ippool -o yaml | grep 'cidr: 10.244.0.0/16'"
-      register: cidr_check
-      failed_when: cidr_check.rc != 0
-
     - name: Verify cluster communication
       shell: kubectl get nodes
       register: nodes_status

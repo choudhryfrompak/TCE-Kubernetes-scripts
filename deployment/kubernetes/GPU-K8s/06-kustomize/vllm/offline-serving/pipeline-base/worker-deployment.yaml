@@ -38,8 +38,10 @@ spec:
         volumeMounts:
         - name: huggingface-cache
           mountPath: /root/.cache/huggingface
-        - name: benchmarks
-          mountPath: /vllm-workspace/examples
+        # - name: benchmarks
+        #   mountPath: /vllm-workspace/examples
+        - name: dshm
+          mountPath: /dev/shm
         command:
         - "/bin/sh"
         - "-c"
@@ -51,6 +53,10 @@ spec:
       - name: huggingface-cache
         hostPath:
           path: /root/.cache/huggingface
-      - name: benchmarks
-        hostPath:
-          path: /root/TCE-Kubernetes-scripts/benchmark-scripts/
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 25Gi
+      # - name: benchmarks
+        # hostPath:
+        #   path: /root/TCE-Kubernetes-scripts/benchmark-scripts/

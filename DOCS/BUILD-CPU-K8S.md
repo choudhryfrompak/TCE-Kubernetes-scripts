@@ -9,6 +9,10 @@ This repository will contain all (Iac) for setting up a Kubernetes cluster on CP
 - Ansible installed on all nodes
 
 ## Initial Setup
+### switch to root:
+```bash
+sudo -i
+```
 
 ### 1. Repository Preparation
 
@@ -37,11 +41,11 @@ Add entries for all nodes:
 ```
 # Control Planes
 10.0.0.101 control-plane
-........more..
+//add more as you want
 # Cluster Workers
 10.0.0.10 worker1
 10.0.0.20 worker2
-..........more..
+//add more as you want
 ```
 
 #### 2.2 Configure Ansible Hosts
@@ -56,12 +60,10 @@ Configure according to your setup:
 # All Kubernetes nodes
 [all]
 control-plane
-worker1
-worker2
 
 # Primary control plane node
 [master_main]
-k8s-master    # Add main master (for multi-master setup)
+control-plane    # Add main master (for multi-master setup)
 
 # All master nodes
 [masters]
@@ -70,14 +72,12 @@ control-plane  # Add all master nodes
 # All worker nodes
 [workers]
 worker1       # Add all worker nodes
-worker2
-
 # Common variables for all nodes
 [all:vars]
 ansible_user=<your-ansible-user>
 ansible_become=yes
 ansible_become_method=sudo
-ansible_ssh_private_key_file=<your-key-file>
+ansible_ssh_private_key_file=<path-to-your-key-file>
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 ```
 

@@ -1,30 +1,22 @@
-# /etc/ansible/hosts or inventory/hosts
-
 # All Kubernetes nodes
 [all]
 control-plane
-worker1
-worker2
 
 # Primary control plane node
 [master_main]
-k8s-master
+control-plane    # Add main master (for multi-master setup)
 
 # All master nodes
 [masters]
-control-plane
+control-plane  # Add all master nodes
 
 # All worker nodes
 [workers]
-worker1
-worker2
-
+worker1       # Add all worker nodes
 # Common variables for all nodes
 [all:vars]
-ansible_user=ubuntu
+ansible_user=<your-ansible-user>
 ansible_become=yes
 ansible_become_method=sudo
-ansible_ssh_private_key_file=
-
+ansible_ssh_private_key_file=<path-to-your-key-file>
 ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-

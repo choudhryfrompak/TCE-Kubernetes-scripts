@@ -56,4 +56,4 @@ spec:
           sizeLimit: 25Gi
       - name: code
         hostPath:
-          path: /root/TCE-Kubernetes-scripts/app
+          path: /root/TCE-Kubernetes-scripts/app/python

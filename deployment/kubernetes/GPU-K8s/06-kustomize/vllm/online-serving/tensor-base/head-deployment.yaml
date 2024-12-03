@@ -54,7 +54,7 @@ spec:
           path: /root/.cache/huggingface
       - name: code
         hostPath:
-          path: /root/TCE-Kubernetes-scripts/app
+          path: /root/TCE-Kubernetes-scripts/app/python
       - name: dshm
         emptyDir:
           medium: Memory

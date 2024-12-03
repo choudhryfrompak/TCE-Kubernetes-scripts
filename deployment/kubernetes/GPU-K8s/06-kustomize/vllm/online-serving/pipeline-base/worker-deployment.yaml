@@ -28,7 +28,7 @@ spec:
         image: localhost:5000/vllm-tce:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8000
+        - containerPort: 8080
           name: vllm
         resources:
           limits:
@@ -59,4 +59,4 @@ spec:
           sizeLimit: 25Gi
       - name: code
         hostPath:
-          path: /root/TCE-Kubernetes-scripts/app
+          path: /root/TCE-Kubernetes-scripts/app/python

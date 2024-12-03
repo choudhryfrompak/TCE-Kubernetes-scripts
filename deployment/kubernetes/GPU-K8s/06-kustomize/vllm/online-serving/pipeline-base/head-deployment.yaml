@@ -21,7 +21,7 @@ spec:
         ports:
         - containerPort: 6379
           name: ray
-        - containerPort: 8000
+        - containerPort: 8080
           name: vllm
         resources:
           limits:
@@ -57,7 +57,7 @@ spec:
           path: /root/.cache/huggingface
       - name: code
         hostPath:
-          path: /root/TCE-Kubernetes-scripts/app
+          path: /root/TCE-Kubernetes-scripts/app/python
       - name: dshm
         emptyDir:
           medium: Memory

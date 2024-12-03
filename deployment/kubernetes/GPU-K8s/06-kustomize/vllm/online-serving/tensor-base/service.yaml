@@ -8,7 +8,7 @@ spec:
     component: head
   ports:
   - protocol: TCP
-    port: 8000
+    port: 8080
     targetPort: vllm
     name: vllm
     nodePort: 30080

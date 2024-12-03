@@ -52,7 +52,7 @@ class LLMPredictor:
 
 # Read one text file from S3. Ray Data supports reading multiple files
 # from cloud storage (such as JSONL, Parquet, CSV, binary format).
-ds = ray.data.read_text("prompts.txt")
+ds = ray.data.read_text("/vllm-workspace/app/benchmarking/prompts.txt")
 
 
 # For tensor_parallel_size > 1, we need to create placement groups for vLLM

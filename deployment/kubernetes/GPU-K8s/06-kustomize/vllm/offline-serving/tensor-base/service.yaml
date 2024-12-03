@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: head-service
+  name: vllm-service
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     component: head
   ports:
   - protocol: TCP
-    port: 6379
-    targetPort: ray
-    name: ray
+    port: 8000
+    targetPort: vllm
+    name: vllm
+    nodePort: 30080

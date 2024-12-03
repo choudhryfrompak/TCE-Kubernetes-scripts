@@ -25,11 +25,8 @@ spec:
           'until nslookup vllm-head-service.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local && nc -z vllm-head-service 6379; do echo waiting for head node; sleep 2; done']
       containers:
       - name: vllm-worker
-        image: vllm/vllm-openai:latest
+        image: localhost:5000/vllm-tce:latest
         imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 8000
-          name: vllm
         resources:
           limits:
             nvidia.com/gpu: 1
@@ -38,8 +35,8 @@ spec:
         volumeMounts:
         - name: huggingface-cache
           mountPath: /root/.cache/huggingface
-        # - name: benchmarks
-        #   mountPath: /vllm-workspace/examples
+        - name: code
+          mountPath: /vllm-workspace/app
         - name: dshm
           mountPath: /dev/shm
         command:
@@ -57,6 +54,6 @@ spec:
         emptyDir:
           medium: Memory
           sizeLimit: 25Gi
-      # - name: benchmarks
-        # hostPath:
-        #   path: /root/TCE-Kubernetes-scripts/benchmark-scripts/
+      - name: code
+        hostPath:
+          path: /root/TCE-Kubernetes-scripts/app

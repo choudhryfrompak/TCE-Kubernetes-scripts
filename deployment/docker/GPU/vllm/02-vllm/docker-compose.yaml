@@ -5,7 +5,7 @@ services:
     build:
       context: ../../../../../
       dockerfile: deployment/docker/GPU/vllm/02-vllm-tensor/Dockerfile
-    image: vllm-tensor:latest
+    image: vllm-tce:latest
     user: root
     environment:
       - NCCL_DEBUG=INFO

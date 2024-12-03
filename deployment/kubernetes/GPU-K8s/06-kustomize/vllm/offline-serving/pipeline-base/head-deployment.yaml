@@ -16,13 +16,11 @@ spec:
         role: master
       containers:
       - name: vllm-head
-        image: vllm/vllm-openai:latest
+        image: localhost:5000/vllm-tce:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 6379
           name: ray
-        - containerPort: 8000
-          name: vllm
         resources:
           limits:
             nvidia.com/gpu: 1
@@ -33,8 +31,8 @@ spec:
           mountPath: /root/.cache/huggingface
         - name: dshm
           mountPath: /dev/shm
-        # - name: benchmarks
-        #   mountPath: /vllm-workspace/examples
+        - name: code
+          mountPath: /vllm-workspace/app
         command:
         - "/bin/sh"
         - "-c"
@@ -47,6 +45,6 @@ spec:
         emptyDir:
           medium: Memory
           sizeLimit: 25Gi
-      # - name: benchmarks
-        # hostPath:
-        #   path: /root/TCE-Kubernetes-scripts/benchmark-scripts/
+      - name: code
+        hostPath:
+          path: /root/TCE-Kubernetes-scripts/app

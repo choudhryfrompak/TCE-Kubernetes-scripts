@@ -16,23 +16,21 @@ spec:
         role: master
       containers:
       - name: vllm-head
-        image: vllm/vllm-openai:latest
+        image: localhost:5000/vllm-tce:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 6379
-          name: ray
         - containerPort: 8080
           name: vllm
         resources:
           limits:
-            nvidia.com/gpu: 1
+            nvidia.com/gpu: 4
           requests:
-            nvidia.com/gpu: 1
+            nvidia.com/gpu: 4
         volumeMounts:
         - name: huggingface-cache
           mountPath: /root/.cache/huggingface
-        # - name: benchmarks
-        #   mountPath: /vllm-workspace/examples
+        - name: code
+          mountPath: /vllm-workspace/app
         - name: dshm
           mountPath: /dev/shm
         command:
@@ -40,23 +38,23 @@ spec:
           - "-c"
           - |
             ray start --head --port=6379 --block &
-            sleep 30 &&
+            sleep 10 &&
             python3 -m vllm.entrypoints.openai.api_server \
               --port 8080 \
               --trust-remote-code \
               --served-model-name ministral \
               --model mistralai/Ministral-8B-Instruct-2410 \
               --gpu-memory-utilization 0.99 \
-              --tensor-parallel-size 2 \
+              --tensor-parallel-size 4 \
               --dtype half & \
             tail -f /dev/null
       volumes:
       - name: huggingface-cache
         hostPath:
           path: /root/.cache/huggingface
-      # - name: benchmarks
-      #   hostPath:
-      #     path: /root/TCE-Kubernetes-scripts/benchmark-scripts/
+      - name: code
+        hostPath:
+          path: /root/TCE-Kubernetes-scripts/app
       - name: dshm
         emptyDir:
           medium: Memory

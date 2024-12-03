@@ -4,7 +4,7 @@ services:
   vllm:
     build:
       context: ../../../../../
-      dockerfile: deployment/docker/GPU/vllm/02-vllm-tensor/Dockerfile
+      dockerfile: deployment/docker/GPU/vllm/02-vllm/Dockerfile
     image: vllm-tce:latest
     user: root
     environment:

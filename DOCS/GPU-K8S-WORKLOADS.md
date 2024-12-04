@@ -1,7 +1,7 @@
 # 1. vLLM Benchmarking and Serving Project
 
 ## Project Structure
-
+This project uses the image built by Docker compose in the GPU-DOCKER-WORKLOADS.md
 ```
 vllm/
 ├── benchmark-scripts/          # Benchmarking utilities
@@ -18,18 +18,7 @@ vllm/
 - Online and offline serving modes
 - Pipeline-based and tensor-based deployment options
 - Kubernetes-ready configurations
-- Comprehensive benchmarking scripts
-
-## Components
-
-### Benchmark Scripts
-
-- `benchmark-offline-serving.py`: Script for measuring offline serving performance
-- `benchmark-online-serving.py`: Script for measuring online serving performance
-- `commands.txt`: Common commands and usage examples
-- `prompts.txt`: Sample prompts for benchmarking
-
-These will be mounted inside the containers.
+- Comprehensive benchmarking scripts inside the containers.
 
 ### Serving Configurations
 
@@ -43,9 +32,10 @@ Both online and offline serving modes include:
    - Kustomization settings
 
 2. Tensor-parallel Deployment:
-   - Similar structure to pipeline-based deployment
-   -  tensor-parallel configurations.
-
+   - Head deployment configuration(only) //you can edit to change number of gpus
+   - Service definitions
+   - Namespace configuration
+   - Kustomization settings
 ## Setup and Deployment
 
 ### Prerequisites
@@ -53,41 +43,41 @@ Both online and offline serving modes include:
 - Kubernetes cluster
 
 ### Deployment Steps
+```bash
+cd TCE-Kubernetes-scripts/deployment/kubernetes/GPU-K8s/06-kustomize/vllm/
+```
 
-1. Choose serving mode (online/offline):
-   ```bash
+1. Go to the specific directory:
+```bash
    cd <online-serving|offline-serving>
-   ```
+```
 
 2. Select deployment type:
-   ```bash
+```bash
    cd <pipeline-base|tensor-base>
-   ```
-
+```
+### edit the configs if you want.
 3. Apply Kubernetes configurations:
-   ```bash
+```bash
    kubectl apply -k .
-   ```
+```
 
 ### Running Benchmarks
 
-1. Set up your Python environment:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. exec into the pod
+1. exec into the pod
 ```bash
 kubectl exec -it -n vllm-<tag> pods/<pod-name> -- /bin/bash
 
 you can get these details by running:
 kubectl get all -n vllm-online|vllm-offline
 ```
-3. Run offline benchmarks:
-   ```bash
-   python examples/benchmark-offline-serving.py
-   ```
+2. Run offline benchmarks:
+```bash
+   cd app/benchmark/
+   python3 benchmark-offline-serving.py
+```
 
-4. Run online benchmarks:
-   ```bash
+3. Run online benchmarks:
+```bash
    python examples/benchmark-online-serving.py
-   ```
+```

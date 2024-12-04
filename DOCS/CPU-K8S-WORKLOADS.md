@@ -6,11 +6,19 @@
 cd TCE-Kubernetes-scripts/deployment/docker/CPU/
 docker compose up -d
 ```
-after you run docker compose: Do this:
-
+## After you run docker compose: Do this:
+### Pushing the image to local registry>
+### Setup local registry
+```bash
+docker run -d -p 5000:5000 --name local-registry registry:2
+##the local registry will start running on localhost:5000 verify that by :
+docker ps
+##you should see:
+<container-id>   registry:2        "/entrypoint.sh /etc…"   14 hours ago     Up 29 minutes   0.0.0.0:5000->5000/tcp, :::5000->5000/tcp   local-registry
+```
 ```bash
 # Set the variable
-DOCKER_ACC="your-account-name"
+DOCKER_ACC="localhost:5000"
 
 docker tag testapi:latest ${DOCKER_ACC}/testapi:latest
 docker tag testui:latest ${DOCKER_ACC}/testui:latest

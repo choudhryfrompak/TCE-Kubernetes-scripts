@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: testapi
-        image: choudhry2272/testapi:latest
+        image: localhost:5000/testapi:latest
         ports:
         - containerPort: 8080
         - containerPort: 8081

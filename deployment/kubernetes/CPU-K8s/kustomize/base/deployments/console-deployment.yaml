@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: testconsole
-        image: choudhry2272/testconsole:latest
+        image: localhost:5000/testconsole:latest
         volumeMounts:
         - name: input-volume
           mountPath: /input

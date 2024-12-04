@@ -12,7 +12,7 @@ spec:
         command: ['sh', '-c', 'until nc -z test-pg-db 5432; do echo waiting for db; sleep 2; done;']
       containers:
       - name: db-seed
-        image: choudhry2272/cpu-test-pg-db-seed:latest
+        image: localhost:5000/cpu-test-pg-db-seed:latest
         env:
         - name: POSTGRES_USER
           valueFrom:

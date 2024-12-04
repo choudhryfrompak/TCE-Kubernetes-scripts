@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: testui
-        image: choudhry2272/testui:latest
+        image: localhost:5000/testui:latest
         ports:
         - containerPort: 80
         env:

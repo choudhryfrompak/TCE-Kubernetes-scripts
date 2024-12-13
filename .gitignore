@@ -112,3 +112,4 @@ nbproject/private/
 /secrets/*.txt
 */**/tsconfig.app.tsbuildinfo
 */**/tsconfig.node.tsbuildinfo
+my-applications/*
